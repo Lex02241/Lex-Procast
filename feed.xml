@@ -11,6 +11,15 @@
     <itunes:category text="Education"/>
     <atom:link href="https://lex02241.github.io/Lex-Procast/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>别再让智能体排队：Graph Engineering 十四步路线图</title>
+      <description>阿哲和小雨聊 seeco 的 X 长文《Graph Engineering》：多步智能体的天花板不在模型，而在工作的形状。</description>
+      <pubDate>Tue, 06 Oct 2026 22:33:20 +0800</pubDate>
+      <enclosure url="https://lex02241.github.io/Lex-Procast/episodes/graph-engineering-2026-10-06.mp3" length="3979661" type="audio/mpeg"/>
+      <guid isPermaLink="true">https://lex02241.github.io/Lex-Procast/episodes/graph-engineering-2026-10-06.mp3</guid>
+      <itunes:duration>497</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
       <title>Agent = 模型 + Harness：解剖 11 个代码智能体的论文</title>
       <description>阿哲和小雨聊 2026 年 7 月 arXiv 论文《Harness Engineering》：四百万行生产代码解剖，Agent 的另一半正在成为一门独立的工程学科。</description>
       <pubDate>Tue, 06 Oct 2026 18:00:00 +0800</pubDate>
