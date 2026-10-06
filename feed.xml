@@ -11,6 +11,15 @@
     <itunes:category text="Education"/>
     <atom:link href="https://lex02241.github.io/Lex-Procast/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Agent = 模型 + Harness：解剖 11 个代码智能体的论文</title>
+      <description>阿哲和小雨聊 2026 年 7 月 arXiv 论文《Harness Engineering》：四百万行生产代码解剖，Agent 的另一半正在成为一门独立的工程学科。</description>
+      <pubDate>Tue, 06 Oct 2026 18:00:00 +0800</pubDate>
+      <enclosure url="https://lex02241.github.io/Lex-Procast/episodes/agent-harness-11-2026-10-06.mp3" length="4774501" type="audio/mpeg"/>
+      <guid isPermaLink="true">https://lex02241.github.io/Lex-Procast/episodes/agent-harness-11-2026-10-06.mp3</guid>
+      <itunes:duration>596</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
       <title>高性价比人生指南：667 条有证据的人生建议</title>
       <description>阿哲和小雨聊 GitHub 热门项目 HowToLiveBetter：一本每条建议都写明成本、收益、证据等级和原始出处的人生操作手册。</description>
       <pubDate>Mon, 06 Oct 2026 12:31:00 +0800</pubDate>
