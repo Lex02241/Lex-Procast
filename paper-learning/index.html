@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>论文 learning</title>
+<style>
+body{font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;max-width:720px;margin:0 auto;padding:24px 20px;color:#222;line-height:1.8}
+a{color:#0b5fff}
+audio{width:100%;margin:12px 0}
+.card{border:1px solid #ddd;border-radius:12px;padding:16px 18px;margin:16px 0}
+.card h2{margin:0 0 6px;font-size:20px}
+.meta{color:#666;font-size:14px}
+.line{margin:10px 0}
+.spk{font-weight:700;margin-right:6px}
+.dl{display:inline-block;margin:6px 0;padding:8px 16px;background:#0b5fff;color:#fff;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<h1>论文 learning</h1>
+<p>三篇双人对话音频，每篇一个观点，标题即观点。音频托管在 GitHub Pages，手机点开链接可直接播放、长按下载。</p>
+<div class="card">
+<h2><a href="imagination-visual-gradient.html">想象过程的视觉与梯度：Render 算出来，Latent 学出来</a></h2>
+<p>世界模型想象时，视觉特征要么靠渲染算出来（Render），要么靠模型学出来（Latent）；梯度走身体状态那条路，不走渲染。</p>
+<p class="meta">时长：约 7 分半</p>
+<audio controls preload="none" src="https://lex02241.github.io/Lex-Procast/paper-learning/blog-instinctmj-imagination-dialogue-v6-2026-11-03.mp3"></audio>
+<p><a class="dl" href="https://lex02241.github.io/Lex-Procast/paper-learning/blog-instinctmj-imagination-dialogue-v6-2026-11-03.mp3" download>下载音频（手机长按可存）</a></p>
+</div>
+<div class="card">
+<h2><a href="parkour-velocity-command.html">Parkour 速度控制：速度命令定任务，reference 只给风格</a></h2>
+<p>速度命令规定任务，reference 只进 AMP 判别器给风格，不逐帧指挥动作；想象训练把两者变成能落地的关节动作。</p>
+<p class="meta">时长：约 12 分半</p>
+<audio controls preload="none" src="https://lex02241.github.io/Lex-Procast/paper-learning/blog-parkour-chapter7-dialogue-v6-2026-11-03.mp3"></audio>
+<p><a class="dl" href="https://lex02241.github.io/Lex-Procast/paper-learning/blog-parkour-chapter7-dialogue-v6-2026-11-03.mp3" download>下载音频（手机长按可存）</a></p>
+</div>
+<div class="card">
+<h2><a href="depth-not-differentiable.html">深度图为什么不可微：从动作到深度图这一步没有梯度</a></h2>
+<p>不可微的不是深度图本身，而是从动作到深度图这一步；渲染是离散操作，没有可用梯度，渲染器也不在计算图里。</p>
+<p class="meta">时长：约 4 分钟</p>
+<audio controls preload="none" src="https://lex02241.github.io/Lex-Procast/paper-learning/depth-nondifferentiable-dialogue-2026-11-03.mp3"></audio>
+<p><a class="dl" href="https://lex02241.github.io/Lex-Procast/paper-learning/depth-nondifferentiable-dialogue-2026-11-03.mp3" download>下载音频（手机长按可存）</a></p>
+</div>
+</body>
+</html>

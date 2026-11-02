@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>想象过程的视觉与梯度：Render 算出来，Latent 学出来</title>
+<style>
+body{font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;max-width:720px;margin:0 auto;padding:24px 20px;color:#222;line-height:1.8}
+a{color:#0b5fff}
+audio{width:100%;margin:12px 0}
+.card{border:1px solid #ddd;border-radius:12px;padding:16px 18px;margin:16px 0}
+.card h2{margin:0 0 6px;font-size:20px}
+.meta{color:#666;font-size:14px}
+.line{margin:10px 0}
+.spk{font-weight:700;margin-right:6px}
+.dl{display:inline-block;margin:6px 0;padding:8px 16px;background:#0b5fff;color:#fff;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<p><a href="index.html">← 论文 learning</a></p>
+<h1>想象过程的视觉与梯度：Render 算出来，Latent 学出来</h1>
+<p>世界模型想象时，视觉特征要么靠渲染算出来（Render），要么靠模型学出来（Latent）；梯度走身体状态那条路，不走渲染。</p>
+<p class="meta">时长：约 7 分半</p>
+<audio controls preload="none" src="https://lex02241.github.io/Lex-Procast/paper-learning/blog-instinctmj-imagination-dialogue-v6-2026-11-03.mp3"></audio>
+<p><a class="dl" href="https://lex02241.github.io/Lex-Procast/paper-learning/blog-instinctmj-imagination-dialogue-v6-2026-11-03.mp3" download>下载音频（手机长按可存）</a></p>
+<hr>
+<p class="line"><span class="spk">小雨</span>今天这篇博客有点特别，我们不直接讲结论，先从一个问题开始。如果机器人要在脑子里先演练一遍再行动，它下一步看到的东西，应该从哪来？</p>
+<p class="line"><span class="spk">阿哲</span>好问题。这就是 InstinctMJ 这个 SuperMimic 变体里最关键的一步，世界模型的想象过程。今天我们就按想象的时间顺序走一遍，视觉怎么来、梯度怎么回，都在这个过程里。</p>
+<p class="line"><span class="spk">小雨</span>先说起点。想象是从真机开始的吗？</p>
+<p class="line"><span class="spk">阿哲</span>不是，是从缓存的实际状态开始。但两条路线的起点并不完全相同。Render 是在这个缓存身体状态上重新渲染一张起点深度图，Latent 是直接编码缓存的实际仿真深度，得到初始视觉特征。这里要提醒一句，这里说的深度是物理仿真里的观测，还不是真机验证。</p>
+<p class="line"><span class="spk">小雨</span>那想象里的每一步，Actor 到底看什么？</p>
+<p class="line"><span class="spk">阿哲</span>每一步，同一个 Actor 看三样东西出动作，8 帧本体历史、参考库推进的未来 10 帧参考目标、32 维视觉特征，输出 29 维关节位置动作。这里有两个容易想当然的地方，你先想一下，参考目标是预测出来的吗？本体历史是传感器读数吗？</p>
+<p class="line"><span class="spk">小雨</span>我猜，参考目标应该是参考库推进的，本体历史在想象里只能是算出来的，对吗？</p>
+<p class="line"><span class="spk">阿哲</span>对。参考目标不是预测出来的，是参考库推进的。本体历史在想象里也不是传感器读数，是拿预测身体状态算出来的。</p>
+<p class="line"><span class="spk">小雨</span>动作出来之后呢？世界模型一步算什么？</p>
+<p class="line"><span class="spk">阿哲</span>动作连同身体状态、地形、物理参数一起进世界模型。输入是身体不变特征、动作、物理上下文，还有 187 点高度扫描，Latent 路线还要多一个当前视觉 latent。输出是下一个身体状态，网络先预测运动增量、再积分得到，加上各身体部位的接触预测，Latent 路线还多输出下一个视觉 latent。</p>
+<p class="line"><span class="spk">小雨</span>好，到关键问题了。下一步的视觉特征，两条路线有什么不一样？</p>
+<p class="line"><span class="spk">阿哲</span>这就是核心区别。Render 是算出来的，把预测姿态写回虚拟机器人，用已知场景重新渲染深度图，再过同一个 CNN 编码器，渲染这一步不反传梯度。Latent 是学出来的，不渲染，世界模型直接把 latent 递推到下一步。</p>
+<p class="line"><span class="spk">小雨</span>那编码器是谁训练的？策略梯度会不会直接训到编码器？</p>
+<p class="line"><span class="spk">阿哲</span>不会。两条路线视觉进 Actor 的时候都要 stop-gradient，编码器不通过这条视觉支路接收策略回报梯度。Latent 编码器由重建损失训练，Render 编码器由重建损失，以及逐渐退火的价值辅助损失训练。</p>
+<p class="line"><span class="spk">小雨</span>那你会怎么选？Render 和 Latent 各有什么代价？</p>
+<p class="line"><span class="spk">阿哲</span>你可以先想一下，如果世界模型把姿态预测错了，Render 出来的图会怎样？</p>
+<p class="line"><span class="spk">小雨</span>嗯，渲染是按预测姿态算的，姿态错了，图看起来应该还是对的？</p>
+<p class="line"><span class="spk">阿哲</span>对，这就是 Render 最要小心的坑。好处是视觉和预测姿态几何一致，代价是每步都要渲染，而且依赖已知场景，更关键的是姿态预测错了，比如以为已经站上箱顶，渲染出来的图看起来也是对的，所以必须回真实仿真检验。Latent 省掉了逐步渲染，但多了视觉预测误差随着 32 步展开不断漂移的风险。还有一句要补，部署时结构相同，不代表两条路线训出来的权重和输出动作完全相同。</p>
+<p class="line"><span class="spk">小雨</span>想象一共展开多少步？奖励又是怎么算的？</p>
+<p class="line"><span class="spk">阿哲</span>每一步的奖励都是解析算出来的，身体连杆和参考的位置、朝向、速度误差，根部位姿，再加上动作代价、接触、力矩这些，还要乘软终止的存活权重。这样一步一步展开 32 步，最后再用末端 Critic 的价值把 32 步之后的回报补上。</p>
+<p class="line"><span class="spk">小雨</span>正向走完了，反向怎么走？梯度真的是沿着一条线回去的吗？</p>
+<p class="line"><span class="spk">阿哲</span>主路径是一条线，从回报出发，先对各步预测的身体状态求导，然后梯度穿过世界模型，回到上一个动作，再穿过上一个时刻的同一个 Actor，一路往前。但主路径不是唯一路径，梯度还可以通过动作代价、接触预测、软终止权重和末端价值这些路径影响策略，比如动作变化惩罚直接依赖动作，不必先经过身体状态。</p>
+<p class="line"><span class="spk">小雨</span>这里我最想确认一句，世界模型参数冻结，是不是就等于梯度断了？</p>
+<p class="line"><span class="spk">阿哲</span>不是，这是最容易混淆的一点。冻结只是这一步不更新世界模型的权重，但它对输入的导数还在，梯度照样能穿过去。如果把预测状态 detach，就会切断经这些状态传递的长期梯度，破坏这套方法依赖的模型式策略优化，但动作代价等其他路径仍可能有梯度，所以不能说 Actor 就完全没法学。</p>
+<p class="line"><span class="spk">小雨</span>最后，这一步到底更新了谁？</p>
+<p class="line"><span class="spk">阿哲</span>如果只说想象回报这条梯度，它主要用于更新 Actor，世界模型、主 Critic、failure head 的参数都冻结，回报梯度也不沿视觉入口更新 CNN。但如果指整个 policy_update，就不准确了，代码里还计算视觉辅助损失，Render 编码器也可能在同一轮更新，随后 Critic 再另行拟合回报目标。所以准确的说法是，想象回报这条梯度主要用于更新 Actor，世界模型用实际转移数据拟合，Critic 用回报目标拟合，编码器用辅助目标训练。它们可以在同一轮训练循环中更新，但学习信号不同。</p>
+<p class="line"><span class="spk">小雨</span>部署的时候呢？还需要世界模型吗？</p>
+<p class="line"><span class="spk">阿哲</span>不需要了。用真实深度图加本体历史加参考目标，同一个 Actor 直接出动作。最后用一句话收尾，正向反复调用同一个 Actor，展开 32 步想象，反向汇总批量轨迹中各步对共享参数的梯度贡献，回报是含折扣和存活权重的均值，经裁剪后完成一次 Actor 优化。</p>
+<p><a href="index.html">← 回到 论文 learning</a></p>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parkour 速度控制：速度命令定任务，reference 只给风格</title>
+<style>
+body{font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;max-width:720px;margin:0 auto;padding:24px 20px;color:#222;line-height:1.8}
+a{color:#0b5fff}
+audio{width:100%;margin:12px 0}
+.card{border:1px solid #ddd;border-radius:12px;padding:16px 18px;margin:16px 0}
+.card h2{margin:0 0 6px;font-size:20px}
+.meta{color:#666;font-size:14px}
+.line{margin:10px 0}
+.spk{font-weight:700;margin-right:6px}
+.dl{display:inline-block;margin:6px 0;padding:8px 16px;background:#0b5fff;color:#fff;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<p><a href="index.html">← 论文 learning</a></p>
+<h1>Parkour 速度控制：速度命令定任务，reference 只给风格</h1>
+<p>速度命令规定任务，reference 只进 AMP 判别器给风格，不逐帧指挥动作；想象训练把两者变成能落地的关节动作。</p>
+<p class="meta">时长：约 12 分半</p>
+<audio controls preload="none" src="https://lex02241.github.io/Lex-Procast/paper-learning/blog-parkour-chapter7-dialogue-v6-2026-11-03.mp3"></audio>
+<p><a class="dl" href="https://lex02241.github.io/Lex-Procast/paper-learning/blog-parkour-chapter7-dialogue-v6-2026-11-03.mp3" download>下载音频（手机长按可存）</a></p>
+<hr>
+<p class="line"><span class="spk">小雨</span>上次我们讲了想象过程里的视觉和梯度，今天这篇换一个主角，速度命令加视觉的地形运动。先想一个问题，如果机器人手里没有逐帧的参考动作，它靠什么知道该怎么走？</p>
+<p class="line"><span class="spk">阿哲</span>靠三样东西，速度命令告诉它想怎么走，深度图和身体反馈告诉它眼前是什么、自己是什么状态。这套任务就是 Parkour Target AMP；SuperMimic 是训练方法，训练版全名里带 SuperMimic，环境本身注册名是不带 SuperMimic 的那个。</p>
+<p class="line"><span class="spk">小雨</span>机器人运行时到底需要什么？世界模型那些还在吗？</p>
+<p class="line"><span class="spk">阿哲</span>运行时不需要世界模型、Critic、AMP 判别器，也不需要未来参考动作帧。只要目标位置和速度限制生成速度命令，8 帧历史加深度特征进 Actor，出 29 维关节位置动作。注意目标位置转速度命令这一步，如果保留，还需要位置和朝向估计。</p>
+<p class="line"><span class="spk">小雨</span>Actor 的输入到底是多少维？怎么算出来的？</p>
+<p class="line"><span class="spk">阿哲</span>每帧 96 维，角速度 3、重力方向 3、速度命令 3、相对关节位置 29、关节速度 29、上一动作 29，保留 8 帧就是 768 维。另一条是 8 帧深度图，每帧 18 乘 32，经 CNN 编码成 128 维视觉特征。768 加 128 等于 896，这就是 Actor 的有效输入。输出是 29 维关节位置动作，要经过动作缩放、默认关节位置和 PD 控制器，不是直接输出 29 维电机力矩。</p>
+<p class="line"><span class="spk">小雨</span>我听说 Actor 里有 4 个 MoE 专家，是不是上楼一个、下楼一个、上箱一个，已经各训好一个教师了？</p>
+<p class="line"><span class="spk">阿哲</span>不是。代码没有这种固定对应关系，4 个专家只是内部参与计算的网络结构，不能理解成各训好一个技能的教师。</p>
+<p class="line"><span class="spk">小雨</span>那参考动作去哪了？速度控制为什么还要动作数据？</p>
+<p class="line"><span class="spk">阿哲</span>参考进了 AMP 判别器。你可以把判别器理解成一个标准，学的是什么样的身体运动像合理动作。它看的是连续 10 帧身体运动，每帧 67 维，总共 670 维，关节、身体速度这些运动特征。它不看相机画面，也不拿未来参考关节目标指导 Actor。</p>
+<p class="line"><span class="spk">小雨</span>那任务奖励和风格奖励是怎么分工的？</p>
+<p class="line"><span class="spk">阿哲</span>任务奖励管按速度命令前进、靠近目标，并满足接触这些约束。风格奖励管产生更接近参考动作分布的身体运动。关系就是一句话，速度命令规定任务，reference 提供动作先验。比如给向前速度命令要通过台阶，参考库里是普通行走数据，它约束的是步态自然、协调这些风格；上台阶的抬腿、支撑是靠楼梯交互、速度跟踪奖励和稳定性约束学出来的，ref 里并没有攀爬示范，也不会逐帧指定现在必须执行参考第 137 帧。而且只靠风格奖励不保证能上箱，任务完成一定要在物理仿真里评测。</p>
+<p class="line"><span class="spk">小雨</span>世界模型的输入输出呢？</p>
+<p class="line"><span class="spk">阿哲</span>这套 Parkour 走的是前面讨论过的 Latent 路线，世界模型同时预测身体变化和下一步视觉特征。输入合计 473 维，身体状态特征 70、当前动作 29、当前视觉 latent 128、局部高度扫描 187、关节执行延迟加摩擦 30、上一动作 29。输出三类内容，下一步身体状态、各接触通道的预测概率、下一步 128 维视觉 latent。更准确地说，网络先预测身体状态增量，再积分得到下一状态。接触输出包括左右脚、躯干及配置中的禁止接触部位，是预测概率，不是各部位的连续接触力向量。</p>
+<p class="line"><span class="spk">小雨</span>高度扫描和视觉 latent 为什么要同时保留？</p>
+<p class="line"><span class="spk">阿哲</span>高度扫描帮助世界模型知道哪里有支撑面、台阶与障碍。视觉 latent 让想象过程可以继续为视觉 Actor 提供观测。高度扫描从仿真中已知地形的缓存高度图查询，采用 17 乘 11 等于 187 个点，想象中的机器人位置、朝向改变后，会重新查询对应位置的扫描。</p>
+<p class="line"><span class="spk">小雨</span>Critic 又拿什么？</p>
+<p class="line"><span class="spk">阿哲</span>Critic 使用更完整的训练信息，当前是 302 维特征，包括身体状态、速度命令、目标相对位置和距离、速度限制、足部接触和腾空计时、执行延迟、摩擦、局部高度扫描。它输出一个标量，就是从当前状态继续执行，预计还能得到多少累计回报。所以世界模型是预测下一步会变成什么样，Critic 是估计这个状态后续有多好。当前还配置了失败预测头，使用同类特权特征估计失败概率，为想象轨迹的存活权重提供信息。它同样不是部署时必需的模块。</p>
+<p class="line"><span class="spk">小雨</span>整个训练是怎么转起来的？</p>
+<p class="line"><span class="spk">阿哲</span>可以分成三个反复循环的过程。第一，采集真实交互，当前策略在物理仿真中执行，得到实际身体运动、接触和深度图，参考动作不能替代这些动力学数据。第二，学习模型，用真实转移拟合世界模型，用深度重建训练视觉编码器，用真实策略运动和参考运动训练 AMP 判别器。第三，在模型里优化策略，从真实缓存状态开始，默认向前想象 32 步，每一步由 Actor 出动作，世界模型预测下一状态和视觉 latent，再继续调用同一个 Actor，任务奖励、风格奖励和末端 Critic 共同提供学习信号，最后更新后的策略回到仿真检验。</p>
+<p class="line"><span class="spk">小雨</span>可微到底体现在哪里？是不是整套系统都端到端更新了？</p>
+<p class="line"><span class="spk">阿哲</span>不是。主要路径是未来回报求梯度，到预测身体状态和动作，经过世界模型的状态转移，到 Actor 输出的动作，再到 Actor 参数。此时世界模型的参数冻结，但它对输入的导数保留，因此梯度仍可以穿过它。但这不等于整套系统所有模块都端到端更新。当前默认配置中，视觉特征进入 Actor 时有梯度截断，CNN 主要通过深度重建目标学习，想象阶段用世界模型预测后续视觉 latent，无须逐步渲染深度图，物理仿真器负责采集数据，不在这条反向传播计算图里。所以这套训练的可微部分，重点是通过学习到的动力学模型优化动作策略。</p>
+<p class="line"><span class="spk">小雨</span>最后和前面学的参考跟踪型对比一下？</p>
+<p class="line"><span class="spk">阿哲</span>参考跟踪型是输入未来参考动作目标，reference 提供逐帧跟踪目标，通常需要跟着参考时间轴。当前 Parkour 是输入速度命令和视觉，reference 提供 AMP 动作风格监督，Actor 不依赖参考时间轴。这套训练流程不要求先训教师再蒸馏。和最终目标的关系是更接近速度控制下的地形运动。所以不能把它画成 reference 编码器和速度编码器二选一、接共享解码器，那是另一种控制接口设计。这套任务的核心就两行，速度命令加身体历史加深度视觉进 Actor 出关节动作，参考动作进 AMP 判别器，变成训练时的风格奖励。</p>
+<p class="line"><span class="spk">小雨</span>那是不是说，这套已经能在 T800 上用了？</p>
+<p class="line"><span class="spk">阿哲</span>不能这么说。它比较接近最终希望的方向，给速度指令，机器人结合视觉通过地形，但这不代表当前代码已经在 T800 上验证成功。还有代码自己的速度范围和正向行走约束，接 WASD 时需要核对命令接口，不能直接把有速度输入理解成任意方向的遥控能力都已验证。</p>
+<p class="line"><span class="spk">小雨</span>总结一句？</p>
+<p class="line"><span class="spk">阿哲</span>想象负责把速度命令和风格先验变成能落地的关节动作。</p>
+<p><a href="index.html">← 回到 论文 learning</a></p>
+</body>
+</html>
