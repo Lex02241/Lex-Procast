@@ -32,9 +32,9 @@
       <title>深度图为什么不可微：从动作到深度图这一步没有梯度</title>
       <description>不可微的不是深度图本身，而是从动作到深度图这一步；渲染是离散操作，没有可用梯度，渲染器也不在计算图里。</description>
       <pubDate>Tue, 03 Nov 2026 01:12:00 +0800</pubDate>
-      <enclosure url="https://lex02241.github.io/Lex-Procast/paper-learning/depth-nondifferentiable-dialogue-2026-11-03.mp3" length="1929869" type="audio/mpeg"/>
+      <enclosure url="https://lex02241.github.io/Lex-Procast/paper-learning/depth-nondifferentiable-dialogue-2026-11-03.mp3" length="1432781" type="audio/mpeg"/>
       <guid isPermaLink="true">https://lex02241.github.io/Lex-Procast/paper-learning/depth-nondifferentiable-dialogue-2026-11-03.mp3</guid>
-      <itunes:duration>241</itunes:duration>
+      <itunes:duration>179</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
     <item>
